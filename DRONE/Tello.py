@@ -1,37 +1,52 @@
-#
 from djitellopy import Tello
 import cv2
+import time
+
 
 tello = Tello()
-tello.connect()
+
 
 def visual():
-    frame_read = tello.get_frame_read()
+    # Avvia lo streaming video
+    tello.streamon()
+    # Loop principale
     while True:
-        # Ottieni il frame corrente dal drone
-        frame = frame_read.frame
-
-        # Visualizza il frame in una finestra
-        cv2.imshow("Drone", frame)
-
-        # Premi q sulla tastiera per uscire dal ciclo
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Acquisisce il frame dal flusso video
+        frame = tello.get_frame_read().frame
+        
+        # Inverte i colori del frame da RGB a BGR
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
+        # Visualizza il frame
+        cv2.imshow("Tello Stream", frame)
+        
+        # Controlli della tastiera per interrompere il programma
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):  # Premi 'q' per uscire
             break
     tello.streamoff()
+    cv2.destroyAllWindows()
 
 
-tello.takeoff()
+tello.connect()
+# tello.takeoff()
 
-# Movimento
-tello.move_left(100)  # Muove il drone di 100 cm a sinistra
-tello.move_right(100)  # Muove il drone di 100 cm a destra
-tello.move_up(100)  # Muove il drone di 100 cm in su
-tello.move_down(100)  # Muove il drone di 100 cm in giù
-tello.move_forward(100)  # Muove il drone di 100 cm in avanti
-tello.move_back(100)  # Muove il drone di 100 cm indietro
+# # Movimento
+# tello.move_left(100)  # Muove il drone di 100 cm a sinistra
+# tello.move_right(100)  # Muove il drone di 100 cm a destra
+# tello.move_up(100)  # Muove il drone di 100 cm in su
+# tello.move_down(100)  # Muove il drone di 100 cm in giù
+# tello.move_forward(100)  # Muove il drone di 100 cm in avanti
+# tello.move_back(100)  # Muove il drone di 100 cm indietro
 
-# Rotazione
-tello.rotate_clockwise(90)  # Ruota il drone di 90 gradi in senso orario
-tello.rotate_counter_clockwise(90)  # Ruota il drone di 90 gradi in senso antiorario
+# # Rotazione
+# tello.rotate_clockwise(90)  # Ruota il drone di 90 gradi in senso orario
+# tello.rotate_counter_clockwise(90)  # Ruota il drone di 90 gradi in senso antiorario
 
-tello.land()
+# time.sleep(3)
+# tello.land()
+
+
+visual()
+    
+
