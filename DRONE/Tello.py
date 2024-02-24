@@ -44,7 +44,7 @@ tello.connect()
 # tello.rotate_counter_clockwise(90)  # Ruota il drone di 90 gradi in senso antiorario
 
 # time.sleep(3)
-# tello.land()
+#tello.land()
 
 
 visual()
