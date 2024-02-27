@@ -97,7 +97,7 @@ def main():
         museOperation = np.mean(acquireData(inlet=inlet, fs=fs, eeg_buffer=eeg_buffer))
         print(museOperation)
         print("closed muse operation")
-        if museOperation < 0.3: 
+        if museOperation < 0.15: 
             print("Altezza: "+str(tello.get_height()))
             print("Batteria: " + str(tello.get_battery()))
             height = tello.get_height()
@@ -113,8 +113,8 @@ def main():
             print("Altezza: "+str(tello.get_height()))
             print("Batteria: " + str(tello.get_battery()))
             height = tello.get_height()
-            if height>100:
-                tello.move_down(20)
+            if height>120:
+                tello.move_down(50)
             elif onFlight==False:
                 print("In attesa di concentrazione...")
             else:
