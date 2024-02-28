@@ -22,12 +22,13 @@ OVERLAP_LENGTH = 0.8
 SHIFT_LENGTH = EPOCH_LENGTH - OVERLAP_LENGTH
 INDEX_CHANNEL = [0]
 
+GYROSCOPE_ACTIVATED = False
+
 command = None
 leapCommand = None
 
 tello = Tello()
 tello.connect()
- 
 
 class MuseThread(Thread):
     def __init__(self):
@@ -35,26 +36,49 @@ class MuseThread(Thread):
         self.buffer = queue.Queue()
     def run(self):
         global command
+        SX_GAMMA = 1.5
+
+        DX_GAMMA = -1.5
+
+        SX_THETA = 3
+
+        DX_THETA = -3
+
+        FW_ALPHA = 1.5
+
+        RW_ALPHA = -1.5
+
+        ANGLE = 90  #Rotation angle (degrees)
+        HEIGHT = 20 #Height differential value (centimeters)
+        FORWARD = 20 #FW and BW movement distance (centimeters)
+
+
         print('Looking for an EEG stream...')
         streams = resolve_byprop('type', 'EEG', timeout=2)
+        streams_Gyro = resolve_byprop('type', 'Gyroscope', timeout=2) #start gyroscope
         if len(streams) == 0:
             raise RuntimeError('Can\'t find EEG stream.')
         print("Start acquiring data")
         inlet = StreamInlet(streams[0], max_chunklen=12)
+        inlet_Gyro = StreamInlet(streams_Gyro[0], max_chunklen=12) 
+        info_Gyro = inlet_Gyro.info()
         eeg_time_correction = inlet.time_correction()
         info = inlet.info()
         description = info.desc()
         fs = int(info.nominal_srate())
+        fs_Gyro = int(info_Gyro.nominal_srate()) #gyro data frequency
 
         """ 2. INITIALIZE BUFFERS """
         eeg_buffer = np.zeros((int(fs * BUFFER_LENGTH), 1))
         filter_state = None  # for use with the notch filter
         n_win_test = int(np.floor((BUFFER_LENGTH - EPOCH_LENGTH) / SHIFT_LENGTH + 1))
         band_buffer = np.zeros((n_win_test, 4))
+        prec = 0
+        k=20
+        global GYROSCOPE_ACTIVATED
         """ 3. GET DATA """
         try:
             while True:
-
                 """ 3.1 ACQUIRE DATA """
                 eeg_data, timestamp = inlet.pull_chunk(timeout=1, max_samples=int(SHIFT_LENGTH * fs))
                 ch_data = np.array(eeg_data)[:, INDEX_CHANNEL]
@@ -69,12 +93,47 @@ class MuseThread(Thread):
                 band_beta = utils.compute_beta(data_epoch, fs)
                 
                 band_alpha = utils.compute_alpha(data_epoch, fs)
+                gyro_data, timestamp = inlet_Gyro.pull_chunk(
+                timeout=1, max_samples=int(SHIFT_LENGTH * fs_Gyro))
+                
+                theta = 0.2 * (gyro_data[-1][2] + gyro_data[-2][2] + gyro_data[-3][2] + gyro_data[-4][2] + gyro_data[-5][2]) * 1 / fs_Gyro #velocita in questo istante, media degli ultimi 2 valori, per giroscopio
+                
+                gamma = 0.2 * (gyro_data[-1][0] + gyro_data[-2][0] + gyro_data[-3][0] + gyro_data[-4][0] + gyro_data[-5][0]) * 1 / fs_Gyro
 
+                alpha = 0.2 * (gyro_data[-1][1] + gyro_data[-2][1] + gyro_data[-3][1] + gyro_data[-4][1] + gyro_data[-5][1]) * 1 / fs_Gyro
+                print(theta, gamma, alpha)
+
+                if GYROSCOPE_ACTIVATED == True:
+                    print("vola")
+                    if gamma > SX_GAMMA:
+                        tello.move_right(20)
+                        k += HEIGHT
+                    elif gamma < DX_GAMMA:
+                        if k > HEIGHT:
+                            tello.move_left(20)
+                            k -= HEIGHT
+                    
+                    #Rotation
+                    if prec > DX_THETA and prec < SX_THETA:
+                        if theta > SX_THETA:
+                            tello.rotate_counter_clockwise(+ANGLE)
+                            time.sleep(2)
+                        elif theta < DX_THETA:
+                            tello.rotate_counter_clockwise(-ANGLE)
+                            time.sleep(2)
+                    prec = theta
+                    
+                    #FW and BW
+                    if alpha > FW_ALPHA:
+                        tello.move_forward(FORWARD)
+                    elif alpha < RW_ALPHA:
+                        tello.move_back(FORWARD)
 
                 command = np.mean(band_beta)
 
         except KeyboardInterrupt:
             print('Closing!')
+
 
 def on_click(x, y, button, pressed):
     if button == Button.left:
@@ -121,6 +180,7 @@ class VideoDrone(Thread):
 
 def main():
     #tello.streamon() 
+    global GYROSCOPE_ACTIVATED
     
     museThread = MuseThread() 
     
@@ -129,8 +189,8 @@ def main():
     
     print ("thread started")
 
-    listener = Listener(on_click=on_click, on_scroll=on_scroll)
-    listener.start()
+    # listener = Listener(on_click=on_click, on_scroll=on_scroll)
+    # listener.start()
 
     onFlight = False
     time.sleep(2)
@@ -154,6 +214,7 @@ def main():
                 videoDrone = VideoDrone()
                 videoDrone.start()
                 onFlight=True
+                GYROSCOPE_ACTIVATED = True
             if height < 200:
                 tello.move_up(20)
                 if leapCommand == 50:
@@ -165,10 +226,12 @@ def main():
             else:
                 if leapCommand == 50:
                     tello.rotate_counter_clockwise(50)# manda i comandi al drone per non farlo scendere
+                    leapCommand = 0
                 elif leapCommand == -50:
                     tello.rotate_counter_clockwise(-50)
-                else:
-                    tello.send_rc_control(0,0,0,0)
+                    leapCommand = 0
+                # else:
+                #     tello.send_rc_control(0,0,0,0)
         else:
 
             height = tello.get_height()
