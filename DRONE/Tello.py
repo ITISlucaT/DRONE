@@ -26,7 +26,7 @@ def visual():
         # Controlli della tastiera per interrompere il programma
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):  # Premi 'q' per uscire
-            tello.land()
+           # tello.land()
             break
     
     tello.streamoff()

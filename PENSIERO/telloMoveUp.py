@@ -92,22 +92,38 @@ def main():
     inlet,fs, eeg_buffer = museSettings()
     tello.connect()
     onFlight = False
-    #tello.takeoff()
     while True:
         print("in cycle")
         museOperation = np.mean(acquireData(inlet=inlet, fs=fs, eeg_buffer=eeg_buffer))
         print(museOperation)
         print("closed muse operation")
-        if museOperation < 0.3: 
+        if museOperation < 0.15: 
+            print("Altezza: "+str(tello.get_height()))
+            print("Batteria: " + str(tello.get_battery()))
+            height = tello.get_height()
             if onFlight == False:
+                print("Takeoff")
                 tello.takeoff()
                 onFlight=True
-            tello.send_rc_control(0,0,0,0)# manda i comandi al drone per non farlo scendere
+            if height < 200:
+                tello.move_up(20)
+            else:
+                tello.send_rc_control(0,0,0,0)# manda i comandi al drone per non farlo scendere
         else:
-            break
+            print("Altezza: "+str(tello.get_height()))
+            print("Batteria: " + str(tello.get_battery()))
+            height = tello.get_height()
+            if height>120:
+                tello.move_down(50)
+            elif onFlight==False:
+                print("In attesa di concentrazione...")
+            else:
+                print("Land")
+                break
 
     time.sleep(1)
     tello.land()
+    tello.end()
 
 
     #visual()
