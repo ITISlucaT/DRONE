@@ -3,11 +3,9 @@ from djitellopy import Tello
 import time
 import cv2
 
-import MuseThread
-import VideoDrone
+from MuseThread import MuseThread
+from VideoDrone import VideoDrone
 
-
-GYROSCOPE_ACTIVATED = False
 
 command = None
 leapCommand = None
@@ -15,10 +13,8 @@ leapCommand = None
 tello = Tello()
 tello.connect()
 
-
+time.sleep(1)
 def main():
-    global GYROSCOPE_ACTIVATED
-    
     museThread = MuseThread(tello) 
     
     print ("drone connected")
@@ -30,8 +26,9 @@ def main():
     leapCommand = 0
     while True:
         print("in cycle")
-        museOperation = command
+        museOperation = museThread.command
         print("muse Operation"+ str(museOperation))
+        droneMove = museThread.
         
         print("closed muse operation")
         print("Height: "+str(tello.get_height()))
@@ -47,7 +44,7 @@ def main():
                 videoDrone = VideoDrone(tello)
                 videoDrone.start()
                 onFlight=True
-                GYROSCOPE_ACTIVATED = True
+                museThread.GYROSCOPE_ACTIVATED = True
             if height < 200:
                 tello.move_up(20)
                 if leapCommand == 50:
@@ -76,6 +73,7 @@ def main():
                 tello.land()
                 museThread.stop()
                 videoDrone.stop()
+                time.sleep(1)
                 museThread.join()
                 videoDrone.join()
                 cv2.destroyAllWindows()
