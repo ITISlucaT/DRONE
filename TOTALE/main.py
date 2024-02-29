@@ -27,9 +27,9 @@ class ResultThread(Thread):
         deltaTime = finishTime - startTime
         r.createReport(deltaTime, self.listMuseResult)
         time.sleep(1) 
-        webbrowser.open("output.html")
         
         
-t1 = ResultThread()
-t1.start()
-t1.join()
+        
+# t1 = ResultThread()
+# t1.start()
+# t1.join()

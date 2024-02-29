@@ -2,9 +2,11 @@
 from djitellopy import Tello
 import time
 import cv2
+import webbrowser
 
 from MuseThread import MuseThread
 from VideoDrone import VideoDrone
+from main import ResultThread
 
 
 command = None
@@ -46,19 +48,25 @@ def main():
                 tello.streamon()
                 videoDrone = VideoDrone(tello)
                 videoDrone.start()
+                time.sleep(1)
+                resultThread = ResultThread()
+                resultThread.start()
                 onFlight=True
                 museThread.GYROSCOPE_ACTIVATED = True
 
             if height < 200:
                 # tello.move_up(20)
                 tello.send_rc_control(rollio,beccheggio, 20,imbardata)
+                time.sleep(2)
             else:
                 tello.send_rc_control(rollio,beccheggio,0,imbardata)
+                time.sleep(2)
         else:
             height = tello.get_height()
             if height>120:
                 # tello.move_down(50)
-                tello.send_rc_control(rollio,beccheggio,-50,imbardata)#chat gpt
+                tello.send_rc_control(rollio,beccheggio,-50,imbardata)
+                time.sleep(2)
             elif onFlight==False:
                 print("In attesa di concentrazione...")
                 time.sleep(1)
@@ -70,8 +78,10 @@ def main():
                 time.sleep(1)
                 museThread.join()
                 videoDrone.join()
+                resultThread.join()
                 cv2.destroyAllWindows()
                 print("Land")
+                webbrowser.open("output.html")
                 break
 
 

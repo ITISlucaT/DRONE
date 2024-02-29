@@ -19,7 +19,7 @@ def run():
         float: Mean of the filtered values.
     """
     root = tk.Tk()  # Create the root window
-    
+    root.lift()
     
     def generate_circles():  
         """

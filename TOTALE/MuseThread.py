@@ -53,13 +53,13 @@ class MuseThread(Thread):
         """
         super(MuseThread, self).__init__()
         self.tello = tello
-        self.SX_GAMMA = 120
-        self.DX_GAMMA = -120
-        self.SX_THETA = 120
-        self.DX_THETA = -120
-        self.FW_ALPHA = 100
-        self.RW_ALPHA = -100
-        self.ANGLE = 90
+        self.SX_GAMMA = 10  #ROLLIO
+        self.DX_GAMMA = -10
+        self.SX_THETA = 20  #IMBARDATA
+        self.DX_THETA = -20
+        self.FW_ALPHA = -10  #BECCHEGGIO
+        self.RW_ALPHA = 10
+        self.ANGLE = 40
         self.HEIGHT = 20
         self.FORWARD = 20
         self.prec = 0
@@ -67,7 +67,7 @@ class MuseThread(Thread):
         self.stop_flag = False
         self.GYROSCOPE_ACTIVATED = False
         self.command = 20
-        self.droneCommandList = list()
+        self.droneCommandList = [0,0,0]
     def run(self):
         """
         Run the MuseThread to process EEG and gyroscope data, and control the Tello drone accordingly.
@@ -147,7 +147,7 @@ class MuseThread(Thread):
         gamma = (gyro_data[-1][0] + gyro_data[-2][0] + gyro_data[-3][0] + gyro_data[-4][0] + gyro_data[-5][0]+ gyro_data[-6][0] + gyro_data[-7][0] + gyro_data[-8][0] + gyro_data[-9][0] + gyro_data[0][0]) * 1 / 10 #velocita in questo istante, media degli ultimi 2 valori, per giroscopio
 
         alpha = (gyro_data[-1][1] + gyro_data[-2][1] + gyro_data[-3][1] + gyro_data[-4][1] + gyro_data[-5][1]+ gyro_data[-6][1] + gyro_data[-7][1] + gyro_data[-8][1] + gyro_data[-9][1] + gyro_data[0][1]) * 1 / 10 #velocita in questo istante, media degli ultimi 2 valori, per giroscopio
-        print(theta, gamma, alpha)
+        # print(theta, gamma, alpha)
 
         if self.GYROSCOPE_ACTIVATED == True:
             # print("vola")
@@ -163,9 +163,9 @@ class MuseThread(Thread):
                 self.droneCommandList.insert(0,0)
             
             if theta > self.SX_THETA:
-                self.droneCommandList.insert(1,20) 
+                self.droneCommandList.insert(1,self.ANGLE) 
             elif theta < self.DX_THETA:
-                self.droneCommandList.insert(1,-20) 
+                self.droneCommandList.insert(1,-(self.ANGLE)) 
             else:
                 self.droneCommandList.insert(1,0) 
             
