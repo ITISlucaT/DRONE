@@ -17,6 +17,7 @@ At first we have choosen the leader, Luca Torelli, and then he began assigning t
 * Pietro Giordano took charge of crafting the comprehensive PowerPoint presentation of the entire project.
 
 # INSTRUCTION FOR USE
+*It is advisable to use Windows or MacOS as it is not guaranteed the presence of all third-party software on Linux 
 * In order to use the Muse2, you have to:
   * click on this link and download all the folder: https://github.com/kowalej/BlueMuse , then must unzip this folder: https://github.com/kowalej/BlueMuse/blob/master/DistArchived/BlueMuse_2.0.0.0.zip, and follow his tutorial
   * Then you have to switch on the bluetooth on your pc and start the software of BlueMuse and click on "Start Streaming" and the Muse2 will start to record data.
