@@ -11,8 +11,8 @@ Overall, the project not only offers an interactive and therapeutic experience b
 
 Our group is composed of five members: Luca Torelli, Eugenio Armando, Lorenzo Martino, Pietro Giordano and Francesco Re. 
 
-At first we choose the leader, Luca Torelli, and then we divided various tasks:
-* Luca Torelli and Eugenio Armando have studied the functionality of the Muse, interpreting the sampled values, and subsequently integrated it with the drone to enable spatial movement using the Muse-provided oscilloscope.
+At first we have choosen the leader, Luca Torelli, and then he began assigning tasks to the team members:
+* Luca Torelli and Eugenio Armando have studied the functionality of the Muse, interpreting the sampled values, and subsequently integrated it with the drone to enable spatial movement using the Muse-provided oscilloscope, helped by Pietro Giordano.
 * Lorenzo Martino and Francesco Re have developed the code to create circles on the screen and the interface to resize them, move them in space, or make them clickable and subsequently removable. Additionally, they have been responsible for creating the final user report and interpreting all the data provided by all the programs.
 * Pietro Giordano took charge of crafting the comprehensive PowerPoint presentation of the entire project.
 
