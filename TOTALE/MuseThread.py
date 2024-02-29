@@ -67,7 +67,7 @@ class MuseThread(Thread):
         self.stop_flag = False
         self.GYROSCOPE_ACTIVATED = False
         self.command = 20
-        self.droneCommandList = tuple()
+        self.droneCommandList = list()
     def run(self):
         """
         Run the MuseThread to process EEG and gyroscope data, and control the Tello drone accordingly.
@@ -154,29 +154,29 @@ class MuseThread(Thread):
             print("Rollio: " + str(gamma))
             print("Imbardata: " + str(theta))
             print("Beccheggio: " + str(alpha))
+            
             if gamma > self.SX_GAMMA:
-                self.droneCommandList.index(0)
-                self.vertical_position += self.HEIGHT
+                self.droneCommandList.insert(0,20)  
             elif gamma < self.DX_GAMMA:
-                if self.vertical_position > self.HEIGHT:
-                    self.tello.move_left(20)
-                    self.vertical_position -= self.HEIGHT
+                self.droneCommandList.insert(0,-20)
+            else:
+                self.droneCommandList.insert(0,0)
             
-            #Rotation
-            if self.prec > self.DX_THETA and self.prec < self.SX_THETA:
-                if theta > self.SX_THETA:
-                    self.tello.rotate_counter_clockwise(self.ANGLE)
-                    time.sleep(2)
-                elif theta < self.DX_THETA:
-                    self.tello.rotate_counter_clockwise(-(self.ANGLE))
-                    time.sleep(2)
-            self.prec = theta
+            if theta > self.SX_THETA:
+                self.droneCommandList.insert(1,20) 
+            elif theta < self.DX_THETA:
+                self.droneCommandList.insert(1,-20) 
+            else:
+                self.droneCommandList.insert(1,0) 
             
-            #FW and BW
             if alpha > self.FW_ALPHA:
-                self.tello.move_forward(self.FORWARD)
+                self.droneCommandList.insert(3,20) 
             elif alpha < self.RW_ALPHA:
-                self.tello.move_back(self.FORWARD)
+                self.droneCommandList.insert(3,-20) 
+            else:
+                self.droneCommandList.insert(3,0)
+
+
     def stop(self):
         self.stop_flag = True
 

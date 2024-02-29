@@ -28,8 +28,11 @@ def main():
         print("in cycle")
         museOperation = museThread.command
         print("muse Operation"+ str(museOperation))
-        droneMove = museThread.
-        
+        droneMove = museThread.droneCommandList
+        rollio=droneMove[0]
+        imbardata=droneMove[1]
+        beccheggio=droneMove[2]
+
         print("closed muse operation")
         print("Height: "+str(tello.get_height()))
         print("battery: " + str(tello.get_battery()))
@@ -45,31 +48,22 @@ def main():
                 videoDrone.start()
                 onFlight=True
                 museThread.GYROSCOPE_ACTIVATED = True
-            if height < 200:
-                tello.move_up(20)
-                if leapCommand == 50:
-                    tello.rotate_counter_clockwise(50)# manda i comandi al drone per non farlo scendere
-                    leapCommand = 0
-                elif leapCommand == -50:
-                    tello.rotate_counter_clockwise(-50)
-                    leapCommand = 0
-            else:
-                if leapCommand == 50:
-                    tello.rotate_counter_clockwise(50)# manda i comandi al drone per non farlo scendere
-                    leapCommand = 0
-                elif leapCommand == -50:
-                    tello.rotate_counter_clockwise(-50)
-                    leapCommand = 0
-                # else:
-                #     tello.send_rc_control(0,0,0,0)
-        else:
 
+            if height < 200:
+                # tello.move_up(20)
+                tello.send_rc_control(rollio,beccheggio, 20,imbardata)
+            else:
+                tello.send_rc_control(rollio,beccheggio,0,imbardata)
+        else:
             height = tello.get_height()
             if height>120:
-                tello.move_down(50)
+                # tello.move_down(50)
+                tello.send_rc_control(rollio,beccheggio,-50,imbardata)#chat gpt
             elif onFlight==False:
                 print("In attesa di concentrazione...")
+                time.sleep(1)
             else:
+                #interrompe il programma
                 tello.land()
                 museThread.stop()
                 videoDrone.stop()
